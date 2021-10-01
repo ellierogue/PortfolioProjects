@@ -1,3 +1,7 @@
+--Purpose: Covid19 Number Data
+
+--Skills used: Joins, CTE's, Temp Tables, Windows Functions, Aggregate Functions, Creating Views, Converting Data Types
+
 Select *
 From PortfolioProject.dbo.CovidDeaths
 Where continent is not null
@@ -7,7 +11,7 @@ Order by 3,4
 --From PortfolioProject.dbo.CovidVaccinations
 --Order by 3,4
 
---Select Data that will be used
+--Select Data to start with
 
 Select Location, date, total_cases, new_cases, total_deaths, population
 From PortfolioProject.dbo.CovidDeaths
@@ -16,12 +20,14 @@ Order by 1,2
 
 --Comparing Total Cases vs Total Deaths
 -- Shows likelihood of dying if you contract covid in your country
+
 Select Location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 as DeathPercentage
 From PortfolioProject.dbo.CovidDeaths
 Where location like '%states%' AND continent is NOT null
 Order by 1,2
 
 -- Comparing Total Cases vs Population
+-- Shows the percentage of the population infected with Covid
 
 Select Location, date, population, total_cases, (total_cases/population)*100 as PositivePercentage
 From PortfolioProject.dbo.CovidDeaths
@@ -72,6 +78,7 @@ Group By date
 Order by 1,2
 
 --Total Population vs Vaccinations
+-- Shows Percentage of Population that has received at least one Covid vaccine
 
 Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, SUM(cast(vac.new_vaccinations as int)) OVER (Partition by dea.location Order by dea.location,dea.date) as RollingPeopleVaccinated
 From PortfolioProject.dbo.CovidDeaths dea
@@ -81,7 +88,7 @@ Join PortfolioProject.dbo.CovidVaccinations vac
 where dea.continent is not null
 order by 2,3
 
--- Use Common Table Expression (CTE)
+-- Use Common Table Expression (CTE) and Partition By
 
 With PopvsVac (continent, location, date, population, new_vaccinations, RollingPeopleVaccinated) 
 as
